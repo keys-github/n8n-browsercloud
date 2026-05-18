@@ -7,7 +7,7 @@ import {
 
 export class BrowsercloudApi implements ICredentialType {
 	name = 'browsercloudApi';
-	displayName = 'Browsercloud (TestMu AI) API';
+	displayName = 'TestMu AI (Formerly LambdaTest) API';
 	documentationUrl = 'https://www.testmuai.com/support/docs/';
 
 	properties: INodeProperties[] = [
