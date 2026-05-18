@@ -2,7 +2,7 @@ import { ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class BrowsercloudGoogleGeminiApi implements ICredentialType {
 	name = 'browsercloudGoogleGeminiApi';
-	displayName = 'Google Gemini API (Browsercloud)';
+	displayName = 'Browsercloud Google Gemini API';
 	documentationUrl = 'https://aistudio.google.com/apikey';
 
 	properties: INodeProperties[] = [

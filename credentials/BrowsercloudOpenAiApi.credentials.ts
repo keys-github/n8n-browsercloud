@@ -2,7 +2,7 @@ import { ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class BrowsercloudOpenAiApi implements ICredentialType {
 	name = 'browsercloudOpenAiApi';
-	displayName = 'OpenAI API (Browsercloud)';
+	displayName = 'Browsercloud OpenAI API';
 	documentationUrl = 'https://platform.openai.com/api-keys';
 
 	properties: INodeProperties[] = [

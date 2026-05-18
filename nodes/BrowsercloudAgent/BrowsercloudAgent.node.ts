@@ -1,4 +1,5 @@
 import {
+	ApplicationError,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeType,
@@ -58,13 +59,13 @@ export class BrowsercloudAgent implements INodeType {
 				description:
 					'Operating system to be used for the cloud session. Set once for the whole workflow. Pick a platform compatible with the browser above.',
 				options: [
-					{ name: 'Windows 11', value: 'Windows 11' },
-					{ name: 'Windows 10', value: 'Windows 10' },
+					{ name: 'Linux', value: 'Linux' },
+					{ name: 'macOS Monterey', value: 'macOS Monterey' },
 					{ name: 'macOS Sequoia', value: 'macOS Sequoia' },
 					{ name: 'macOS Sonoma', value: 'macOS Sonoma' },
 					{ name: 'macOS Ventura', value: 'macOS Ventura' },
-					{ name: 'macOS Monterey', value: 'macOS Monterey' },
-					{ name: 'Linux', value: 'Linux' },
+					{ name: 'Windows 10', value: 'Windows 10' },
+					{ name: 'Windows 11', value: 'Windows 11' },
 				],
 			},
 			{
@@ -75,12 +76,12 @@ export class BrowsercloudAgent implements INodeType {
 				description:
 					'Browser version. "latest" tracks the newest stable release; "latest-1" is one major version behind, and so on. Pick a specific number (custom) only if you need a fixed version for reproducibility.',
 				options: [
+					{ name: 'Beta', value: 'beta' },
+					{ name: 'Dev', value: 'dev' },
 					{ name: 'Latest', value: 'latest' },
 					{ name: 'Latest - 1', value: 'latest-1' },
 					{ name: 'Latest - 2', value: 'latest-2' },
 					{ name: 'Latest - 3', value: 'latest-3' },
-					{ name: 'Beta', value: 'beta' },
-					{ name: 'Dev', value: 'dev' },
 				],
 			},
 			{
@@ -107,41 +108,47 @@ export class BrowsercloudAgent implements INodeType {
 				displayName: 'Action',
 				name: 'action',
 				type: 'options',
-				default: '={{ $fromAI("action", "What to do in the browser. One of: navigate, snapshot, click, type, get_text, screenshot.", "string") }}',
+				default: 'navigate',
 				required: true,
 				description:
 					'Filled automatically by the connected AI model. One of: navigate, snapshot, click, type, get_text, screenshot.',
 				options: [
 					{
+						name: 'Click',
+						value: 'click',
+						description: 'Click an element by its ref number from the latest snapshot',
+						action: 'Click an element by its ref number from the latest snapshot',
+					},
+					{
+						name: 'Get Text',
+						value: 'get_text',
+						description: 'Read text from a specific ref or the whole page',
+						action: 'Read text from a specific ref or the whole page',
+					},
+					{
 						name: 'Navigate',
 						value: 'navigate',
 						description: 'Open a URL in the cloud browser',
+						action: 'Open a URL in the cloud browser',
+					},
+					{
+						name: 'Screenshot',
+						value: 'screenshot',
+						description: 'Capture a base64 PNG of the current page (for vision models)',
+						action: 'Capture a base64 png of the current page for vision models',
 					},
 					{
 						name: 'Snapshot',
 						value: 'snapshot',
 						description:
 							'Get a numbered list of clickable / fillable elements on the current page',
-					},
-					{
-						name: 'Click',
-						value: 'click',
-						description: 'Click an element by its ref number from the latest snapshot',
+						action: 'Get a numbered list of clickable / fillable elements on the current page',
 					},
 					{
 						name: 'Type',
 						value: 'type',
 						description: 'Type text into an input element by ref',
-					},
-					{
-						name: 'Get Text',
-						value: 'get_text',
-						description: 'Read text from a specific ref or the whole page',
-					},
-					{
-						name: 'Screenshot',
-						value: 'screenshot',
-						description: 'Capture a base64 PNG of the current page (for vision models)',
+						action: 'Type text into an input element by ref',
 					},
 				],
 			},
@@ -151,14 +158,14 @@ export class BrowsercloudAgent implements INodeType {
 				type: 'string',
 				default: '={{ $fromAI("url", "Absolute URL to open. Used when action=navigate; ignored otherwise.", "string") }}',
 				placeholder: 'https://example.com',
-				description: 'Filled by the AI when action=navigate.',
+				description: 'Filled by the AI when action=navigate',
 				displayOptions: { show: { action: ['navigate'] } },
 			},
 			{
 				displayName: 'Ref',
 				name: 'ref',
 				type: 'number',
-				default: '={{ $fromAI("ref", "Element ref number from the latest snapshot. Used for click, type, and optionally get_text.", "number") }}',
+				default: 0,
 				description:
 					'Filled by the AI for click, type, and (optionally) get_text. Refs come from the latest snapshot.',
 				displayOptions: { show: { action: ['click', 'type', 'get_text'] } },
@@ -168,15 +175,15 @@ export class BrowsercloudAgent implements INodeType {
 				name: 'text',
 				type: 'string',
 				default: '={{ $fromAI("text", "Text to type into the input element. Used when action=type.", "string") }}',
-				description: 'Filled by the AI when action=type.',
+				description: 'Filled by the AI when action=type',
 				displayOptions: { show: { action: ['type'] } },
 			},
 			{
 				displayName: 'Press Enter After Typing',
 				name: 'submit',
 				type: 'boolean',
-				default: '={{ $fromAI("submit", "Press Enter after typing (e.g. to submit a search). Used when action=type.", "boolean") }}',
-				description: 'Filled by the AI when action=type.',
+				default: false,
+				description: 'Whether to press Enter after typing (e.g. to submit a search). Filled by the AI when action=type.',
 				displayOptions: { show: { action: ['type'] } },
 			},
 			{
@@ -191,8 +198,8 @@ export class BrowsercloudAgent implements INodeType {
 				displayName: 'Full Page Screenshot',
 				name: 'fullPage',
 				type: 'boolean',
-				default: '={{ $fromAI("fullPage", "Capture the entire scrollable page (true) or just the viewport (false). Used when action=screenshot.", "boolean") }}',
-				description: 'Filled by the AI when action=screenshot.',
+				default: false,
+				description: 'Whether to capture the entire scrollable page (true) or just the viewport (false). Filled by the AI when action=screenshot.',
 				displayOptions: { show: { action: ['screenshot'] } },
 			},
 		],
@@ -275,7 +282,7 @@ async function dispatch(
 	switch (action) {
 		case 'navigate': {
 			const url = (ctx.getNodeParameter('url', itemIndex) as string).trim();
-			if (!url) throw new Error('URL is required for navigate');
+			if (!url) throw new ApplicationError('URL is required for navigate');
 			await session.page.goto(url, { waitUntil: 'domcontentloaded' });
 			session.refs = await buildSnapshot(session.page);
 			return { snapshot: formatSnapshot(session) };
@@ -328,7 +335,7 @@ async function dispatch(
 				const msg = (err as Error).message;
 				// Surface a clear reason fast instead of waiting the full 30s.
 				if (/element is not enabled|not editable|disabled/i.test(msg)) {
-					throw new Error(
+					throw new ApplicationError(
 						`Element ref ${ref} (<${target.tag}> "${target.text}") is not editable (disabled / readonly). Run snapshot and pick a different input.`,
 					);
 				}
@@ -370,17 +377,17 @@ async function dispatch(
 			return { image: buf.toString('base64'), fullPage };
 		}
 		default:
-			throw new Error(`Unknown action: ${action}`);
+			throw new ApplicationError(`Unknown action: ${action}`);
 	}
 }
 
 function requireRef(session: ManagedSession, ref: number) {
 	if (!Number.isInteger(ref) || ref < 1) {
-		throw new Error(`Ref must be a positive integer, got ${ref}`);
+		throw new ApplicationError(`Ref must be a positive integer, got ${ref}`);
 	}
 	const target = session.refs.find((r) => r.ref === ref);
 	if (!target) {
-		throw new Error(
+		throw new ApplicationError(
 			`No element with ref ${ref}. Run snapshot to refresh refs (current count: ${session.refs.length}).`,
 		);
 	}

@@ -2,7 +2,7 @@ import { ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class BrowsercloudAnthropicApi implements ICredentialType {
 	name = 'browsercloudAnthropicApi';
-	displayName = 'Anthropic API (Browsercloud)';
+	displayName = 'Browsercloud Anthropic API';
 	documentationUrl = 'https://console.anthropic.com/settings/keys';
 
 	properties: INodeProperties[] = [

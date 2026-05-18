@@ -1,34 +1,41 @@
 {
   "name": "n8n-nodes-browsercloud",
-  "version": "0.1.0",
-  "description": "n8n community node to run browser automation scripts on TestMu AI Browser Cloud",
+  "version": "0.2.0",
+  "description": "n8n community nodes for TestMu AI Browser Cloud (formerly LambdaTest). Run browser automation scripts on a real cloud browser, or give an AI Agent native browser tools — navigate, click, type, extract — over Playwright on TestMu's cloud infrastructure.",
   "keywords": [
     "n8n-community-node-package",
     "browsercloud",
     "testmuai",
     "lambdatest",
     "browser-automation",
+    "ai-agent",
     "playwright",
     "puppeteer",
     "selenium"
   ],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/keys-github/n8n-browsercloud",
   "author": {
     "name": "Harish Rajora",
     "email": "harishr@testmuai.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/harishrajora/n8n-browsercloud"
+    "url": "git+https://github.com/keys-github/n8n-browsercloud.git"
   },
-  "main": "index.js",
+  "bugs": {
+    "url": "https://github.com/keys-github/n8n-browsercloud/issues"
+  },
+  "engines": {
+    "node": ">=18.10"
+  },
   "scripts": {
     "build": "tsc && node scripts/copy-icons.js",
     "dev": "tsc --watch",
-    "lint": "eslint nodes credentials --ext .ts",
-    "lint:fix": "eslint nodes credentials --ext .ts --fix",
-    "prepublishOnly": "npm run build && npm run lint"
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [
     "dist"
@@ -48,17 +55,18 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
     "eslint": "^8.57.0",
-    "eslint-plugin-n8n-nodes-base": "^1.16.0",
-    "gulp": "^4.0.2",
+    "eslint-plugin-n8n-nodes-base": "^1.16.3",
+    "jsonc-eslint-parser": "^3.1.0",
     "n8n-workflow": "^1.65.0",
-    "typescript": "5.4"
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@testmuai/browser-cloud": "*",
-    "playwright-core": "^1.59.1"
+    "@testmuai/browser-cloud": "^1.0.1",
+    "playwright-core": "^1.40.0"
   },
   "peerDependencies": {
     "n8n-workflow": "*"

@@ -4,3 +4,6 @@ dist
 .DS_Store
 .env
 .vscode
+.tsbuildinfo
+*.tgz
+.n8n-script-tmp

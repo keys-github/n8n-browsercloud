@@ -106,7 +106,7 @@ const sessionName = \`\${process.env.N8N_WORKFLOW_NAME || 'n8n'}_\${new Date().t
 					'Whether to keep processing remaining items if a script exits non-zero. Errors are returned in the output instead of stopping the run.',
 			},
 			{
-				displayName: 'Timeout (ms)',
+				displayName: 'Timeout (Ms)',
 				name: 'timeoutMs',
 				type: 'number',
 				default: 300000,
@@ -119,7 +119,7 @@ const sessionName = \`\${process.env.N8N_WORKFLOW_NAME || 'n8n'}_\${new Date().t
 				type: 'boolean',
 				default: false,
 				description:
-					'When on, the output includes the raw stdout, stderr, and exit code of the script (useful for debugging). When off (default), the output is a clean summary with status, success flag, and result only.',
+					'Whether to include the raw stdout, stderr, and exit code of the script in the output (useful for debugging). When off, the output is a clean summary with status, success flag, and result only.',
 			},
 		],
 	};
