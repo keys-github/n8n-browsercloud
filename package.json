@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-browsercloud",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "n8n community nodes for TestMu AI Browser Cloud (formerly LambdaTest). Run browser automation scripts on a real cloud browser, or give an AI Agent native browser tools — navigate, click, type, extract — over Playwright on TestMu's cloud infrastructure.",
   "keywords": [
     "n8n-community-node-package",
