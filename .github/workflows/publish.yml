@@ -1,0 +1,48 @@
+name: Publish to npm
+
+# Triggered when a version tag (vX.Y.Z) is pushed. The standard release flow is:
+#   1. Bump version locally:  npm version patch | minor | major
+#   2. Push commits + tag:    git push && git push --tags
+#   3. This workflow picks up the tag, builds, lints, and publishes to npm
+#      with provenance — required for n8n Verified Community Node submission
+#      since May 2026.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  # Required for npm provenance — lets the workflow attest the package's origin
+  # via OIDC. Without this, --provenance can't generate the cryptographic proof.
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # registry-url is required for npm publish; setup-node writes it
+          # into ~/.npmrc and wires NODE_AUTH_TOKEN automatically.
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Publish to npm with provenance
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
